@@ -377,6 +377,8 @@ function setLang(l,anim){lang=l;document.documentElement.lang=l;document.documen
 if(anim){document.body.classList.remove('swap');void document.body.offsetWidth;document.body.classList.add('swap')}
 try{localStorage.setItem('minova-lang',l)}catch(e){}}
 $('#lang').addEventListener('click',()=>{const nl=lang==='en'?'ar':'en';if(document.startViewTransition&&!matchMedia('(prefers-reduced-motion: reduce)').matches){document.startViewTransition(()=>setLang(nl,false))}else setLang(nl,true)});
+document.addEventListener('click',e=>{const a=e.target.closest('a[href^="#"]');if(!a)return;const id=a.getAttribute('href').slice(1),t=id==='home'?null:document.getElementById(id);e.preventDefault();if(t)t.scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'});else scrollTo({top:0,behavior:'smooth'})});
+if(location.hash){const t=document.getElementById(location.hash.slice(1));if(t&&location.hash!=='#home')setTimeout(()=>t.scrollIntoView(),300);try{history.replaceState(null,'',location.pathname+location.search)}catch(e){}}
 const spy=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){document.querySelectorAll('.links a').forEach(a=>a.classList.toggle('on',a.getAttribute('href')==='#'+e.target.id))}}),{rootMargin:'-45% 0px -50% 0px'});
 ['services','work','process','contact'].forEach(id=>spy.observe(document.getElementById(id)));
 let saved='en';try{saved=localStorage.getItem('minova-lang')||(location.hash==='#ar'?'ar':'en')}catch(e){}
