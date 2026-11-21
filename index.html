@@ -162,21 +162,34 @@ html[dir=rtl] .track{animation-name:tickr}
 .card p{margin:0;color:var(--mute);font-size:15px}
 /* work */
 .work{background:linear-gradient(180deg,var(--bg),var(--bg2) 30%,var(--bg2) 70%,var(--bg))}
-.case{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:clamp(28px,5vw,72px);align-items:center;padding:clamp(28px,4vw,48px) 0}
+.case{padding:clamp(36px,5vw,64px) 0}
 .case+.case{border-top:1px solid var(--line)}
+.case-top{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);gap:clamp(28px,5vw,64px);align-items:center}
 .case:nth-child(even) .show{order:2}
-.show{position:relative;border-radius:28px;padding:clamp(24px,4vw,48px);background:radial-gradient(circle at 50% 40%,rgba(70,100,255,.28),transparent 70%),rgba(10,22,70,.5);border:1px solid var(--line);overflow:hidden;display:grid;place-items:center;min-height:360px}
+.show{position:relative;border-radius:28px;padding:clamp(20px,3.5vw,44px);background:radial-gradient(circle at 50% 40%,rgba(70,100,255,.28),transparent 70%),rgba(10,22,70,.5);border:1px solid var(--line);overflow:hidden;display:grid;place-items:center;min-height:340px}
 .show .stagebox{max-width:460px}
 .show .ph{font-size:calc(100cqw / 26);width:26em;height:31em}.ph .orbit{inset:2em -6em;width:calc(100% + 12em);height:calc(100% - 4em)}
 .mini{position:relative;font-size:calc(100cqw / 44);width:44em;height:30em;margin-inline:auto}
-.tag{display:inline-flex;gap:8px;flex-wrap:wrap;margin:18px 0 20px}
-.tag span{font-size:13px;padding:5px 12px;border-radius:999px;border:1px solid var(--line);color:#c6d2ff;background:rgba(255,255,255,.03)}
-.case h3{font-size:clamp(26px,3vw,36px);margin:6px 0 14px;letter-spacing:-.01em}
-.case ul{list-style:none;padding:0;margin:0 0 24px;display:grid;gap:10px;color:var(--mute)}
-.case li{display:flex;gap:12px;align-items:flex-start}
-.case li::before{content:"";flex:none;width:18px;height:18px;margin-top:4px;border-radius:50%;background:var(--grad);-webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 2a10 10 0 100 20 10 10 0 000-20zm-1.5 14.2L6 11.7l1.4-1.4 3.1 3.1 6.1-6.1L18 8.7z'/%3E%3C/svg%3E") center/contain no-repeat;mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 2a10 10 0 100 20 10 10 0 000-20zm-1.5 14.2L6 11.7l1.4-1.4 3.1 3.1 6.1-6.1L18 8.7z'/%3E%3C/svg%3E") center/contain no-repeat}
-.badge{display:inline-block;margin-inline-end:12px;font-size:12.5px;font-weight:600;padding:4px 12px;border-radius:999px;background:rgba(139,92,246,.18);color:#d4c5ff;border:1px solid rgba(139,92,246,.4)}
-.prob{color:#c9d3ff;font-size:16px;margin:0 0 16px}
+.ckind{color:#8fb4ff;font-weight:600;font-size:14px;margin:0}
+.case h3{font-size:clamp(28px,3.2vw,40px);margin:8px 0 14px;letter-spacing:-.01em}
+.case h3 .alt{opacity:.55;font-weight:600;margin-inline-start:.25em}
+html[lang=ar] .case h3{letter-spacing:0}
+.prob{color:#c9d3ff;font-size:16.5px;margin:0}
+.tag{display:flex;gap:8px;flex-wrap:wrap;margin:20px 0 22px}
+.tag span{font-size:13px;line-height:1;padding:8px 13px;border-radius:999px;border:1px solid var(--line);color:#c6d2ff;background:rgba(255,255,255,.03)}
+.badge{display:inline-flex;align-items:center;font-size:12.5px;line-height:1;font-weight:600;padding:7px 12px;border-radius:999px;background:rgba(139,92,246,.18);color:#d4c5ff;border:1px solid rgba(139,92,246,.4);margin-bottom:12px}
+.fhead{margin:clamp(32px,4vw,48px) 0 16px;font-weight:700;font-size:18px}
+.fhead span{color:var(--mute);font-weight:500}
+.feats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.feat{border:1px solid var(--line);background:rgba(16,30,84,.38);border-radius:18px;padding:18px 18px 18px;transition:border-color .4s,transform .4s var(--ease),background .4s}
+.feat:hover{border-color:rgba(130,150,255,.42);transform:translateY(-3px);background:rgba(24,42,110,.45)}
+.fi{display:flex;align-items:center;gap:12px;margin-bottom:10px}
+.fi svg{flex:none;width:40px;height:40px;padding:9px;border-radius:12px;background:linear-gradient(140deg,rgba(47,123,255,.25),rgba(139,92,246,.25));border:1px solid rgba(140,160,255,.3);stroke:#c6d2ff;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;overflow:visible}
+.fi h4{margin:0;font-size:16px;line-height:1.3;font-weight:700}
+.feat p{margin:0;color:var(--mute);font-size:14.5px;line-height:1.6}
+html[lang=ar] .feat p{line-height:1.75}
+.more{display:none}
+@media(max-width:600px){.case:not(.open) .feat:nth-child(n+7){display:none}.more{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;min-height:48px;margin-top:12px;border-radius:14px;border:1px solid var(--line);background:rgba(255,255,255,.04);color:var(--ink);font-family:inherit;font-weight:600;font-size:15px;cursor:pointer}.more svg{width:18px;height:18px;transition:transform .35s var(--ease)}.more span+span,.case.open .more span:first-child{display:none}.case.open .more span+span{display:inline}.case.open .more svg{transform:rotate(180deg)}}
 .note{color:#6f7cad;font-size:13px;text-align:center;margin-top:8px}
 /* process */
 .steps{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:22px;position:relative}
@@ -202,8 +215,9 @@ footer{border-top:1px solid var(--line);padding:30px 0;color:#7b87b8;font-size:1
 footer .wrap{display:flex;flex-wrap:wrap;gap:12px 24px;justify-content:space-between;align-items:center}
 body.swap main,body.swap header .links{animation:sw .5s var(--ease)}
 @keyframes sw{from{opacity:0;filter:blur(6px)}}
-@media(max-width:980px){.links{display:none}.hgrid{grid-template-columns:1fr}.hero{padding-top:100px}.svc{grid-template-columns:repeat(2,minmax(0,1fr))}.case,.case:nth-child(even){grid-template-columns:1fr}.case:nth-child(even) .show{order:0}.steps,.promise{grid-template-columns:repeat(2,minmax(0,1fr))}.rail{display:none}}
-@media(max-width:600px){.svc,.steps,.promise{grid-template-columns:1fr}.nav .btn span{display:none}.nav .btn{padding:0 13px}.brand small{display:none}.hero h1{font-size:clamp(36px,10.5vw,48px)}.show{min-height:0;padding:18px}.ctas .btn{flex:1}}
+@media(max-width:980px) and (min-width:601px){.feat:last-child:nth-child(odd){grid-column:1/-1}}
+@media(max-width:980px){.links{display:none}.hgrid{grid-template-columns:1fr}.hero{padding-top:100px}.svc{grid-template-columns:repeat(2,minmax(0,1fr))}.case-top{grid-template-columns:1fr}.case:nth-child(even) .show{order:0}.feats{grid-template-columns:repeat(2,minmax(0,1fr))}.steps,.promise{grid-template-columns:repeat(2,minmax(0,1fr))}.rail{display:none}}
+@media(max-width:600px){.svc,.steps,.promise,.feats{grid-template-columns:1fr}.nav .btn span{display:none}.nav .btn{padding:0 13px}.brand small{display:none}.hero h1{font-size:clamp(36px,10.5vw,48px)}.show{min-height:0;padding:18px}.ctas .btn{flex:1}}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}.rv,.fade,.hero h1 .w>span{opacity:1!important;transform:none!important}}
 </style>
 </head>
@@ -242,7 +256,7 @@ body.swap main,body.swap header .links{animation:sw .5s var(--ease)}
 </div></section>
 
 <section class="band work" id="work"><div class="wrap">
-  <div class="head rv"><div class="kicker" data-k="wk">Our work</div><h2 data-k="wh">Real products we have built.</h2><p class="lead" data-k="wl">Three examples of what we design and build, from the first idea to the people using it every day.</p></div>
+  <div class="head rv"><div class="kicker" data-k="wk">Our work</div><h2 data-k="wh">Real products we have built.</h2><p class="lead" data-k="wl">Three systems we designed and built, from the first idea to the people using them every day.</p></div>
   <div id="cases"></div>
   <p class="note" data-k="note">Screens shown with sample data.</p>
 </div></section>
@@ -287,17 +301,47 @@ svc:[
 ["M3 21V10l6 4V10l6 4V6l6 4v11zM7 17h2M12 17h2M17 17h2","Factory & workshop systems","أنظمة مصانع وورش","Replace paper and scattered sheets with simple screens for production, materials and shifts.","بدل الورق والشيتات المتفرقة، شاشات بسيطة للإنتاج والخامات والورديات."],
 ["M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M5.6 18.4l2.1-2.1M16.3 7.7l2.1-2.1M12 9a3 3 0 100 6 3 3 0 000-6z","Automation & reports","أتمتة وتقارير","Let the computer do the repeating work: social media posting, daily reports and alerts.","خلّي الكمبيوتر يعمل الشغل المتكرر: النشر على السوشيال، والتقارير اليومية، والتنبيهات."]],
 cases:[
-{dev:"lu",badge:null,name:["LUMIA Care","LUMIA Care"],kind:["Online shop · Android app · Automation","متجر أونلاين · تطبيق أندرويد · أتمتة"],
-prob:["A beauty and care products store needed to sell online and stop managing orders, stock and posts by hand.","محل منتجات عناية وتجميل كان محتاج يبيع أونلاين ويبطّل يدير الطلبات والمخزن والبوستات باليد."],
-pts:[["Bilingual online shop with a welcome page and ordering on WhatsApp","متجر أونلاين بلغتين، بصفحة ترحيب وطلب على واتساب"],["Its own Android app for products, stock, orders, purchases and reports","تطبيق أندرويد خاص للمنتجات والمخزن والطلبات والمشتريات والتقارير"],["Reads supplier invoices and checks weights automatically","بيقرا فواتير الموردين ويراجع الأوزان أوتوماتيك"],["A posting robot that publishes products on social media","روبوت بينشر المنتجات على السوشيال ميديا"]],
-tags:[["Web","ويب"],["Android","أندرويد"],["Automation","أتمتة"]],link:["https://lumia-store.github.io","Visit the live shop","زور المتجر"]},
-{dev:"pos",badge:null,name:["Drinks store","محل مشروبات"],kind:["Cashier system · Online menu","نظام كاشير · منيو أونلاين"],
-prob:["A soft drinks store needed fast selling at the counter, clean receipts and an end of day that always matches the cash.","محل مشروبات ومياه غازية كان محتاج بيع سريع على الكاشير، وفواتير واضحة، وتقفيل آخر اليوم يطابق الفلوس دايمًا."],
-pts:[["Arabic-first cashier app that works fully offline","برنامج كاشير بالعربي أولًا وشغال من غير إنترنت"],["Receipt printer and cash drawer connected","طابعة فواتير ودُرج فلوس متوصلين"],["Delivery orders with a drivers list","طلبات دليفري بقائمة سواقين"],["Automatic backups and an online menu for customers","نسخ احتياطي أوتوماتيك ومنيو أونلاين للعملاء"]],
-tags:[["Desktop","كمبيوتر"],["POS","كاشير"],["Offline","بدون إنترنت"]]},
-{dev:"ms",badge:["In development","تحت التطوير"],name:["Masna'i <span dir=\"rtl\" lang=\"ar\" style=\"opacity:.55;font-weight:600\">مصنعي</span>","مصنعي"],kind:["Factory management app","تطبيق إدارة مصانع"],
-prob:["Small plastic-recycling factories run on paper and memory. Workers need something as easy as WhatsApp.","مصانع إعادة تدوير البلاستيك الصغيرة شغالة بالورق والذاكرة. والعمال محتاجين حاجة سهلة زي الواتساب."],
-pts:[["Fully Arabic, with big buttons and very few words","عربي بالكامل، بزراير كبيرة وكلام قليل جدًا"],["Daily production, materials in and out, and shifts","الإنتاج اليومي، ودخول وخروج الخامات، والورديات"],["Simple reports the owner reads in seconds","تقارير بسيطة صاحب المصنع يقراها في ثواني"],["Starts on Android, moves to the office PC later","بيبدأ على أندرويد وبعدين ينتقل لكمبيوتر المكتب"]],
+{dev:"lu",name:["LUMIA Care","LUMIA Care"],kind:["Online shop · Android & laptop app · AI · Automation","متجر أونلاين · تطبيق أندرويد ولابتوب · ذكاء اصطناعي · أتمتة"],
+prob:["A store importing German beauty and care products needed one system for the website, orders, stock, buying trips and marketing, instead of WhatsApp chats and notebooks.","متجر بيستورد منتجات عناية وتجميل ألماني كان محتاج نظام واحد للموقع والطلبات والمخزن ورحلات الشراء والتسويق، بدل محادثات الواتساب والكشاكيل."],
+f:[["globe","Bilingual online shop","متجر أونلاين بلغتين","Product pages with photos, sizes, ingredients and how to use, customer accounts, and an install-as-app button.","صفحات منتجات بالصور والأحجام والمكونات وطريقة الاستخدام، وحسابات للعملاء، وزرار تثبيت كتطبيق."],
+["chat","AI chat assistant","مساعد ذكي للدردشة","Answers customers' questions about products on the website, day and night.","بيرد على أسئلة العملاء عن المنتجات على الموقع ليل نهار."],
+["cart","Orders from WhatsApp","طلبات من الواتساب","Paste the customer's message and the order is created, stock reserved and address saved.","تلصق رسالة العميل فيتعمل الطلب ويتحجز المخزون ويتسجل العنوان."],
+["box","Stock and pre-orders","المخزون والطلب المسبق","Free, in hand, reserved and on the way for every product; pre-orders go to the shopping list automatically.","المتاح والموجود والمحجوز واللي في الطريق لكل منتج، والطلبات المسبقة بتروح لقائمة الشراء أوتوماتيك."],
+["scale","Import costing and weights","تكلفة الاستيراد والأوزان","Euro rate, shipping cost per kg, trips and a weights check turn every purchase into a correct price.","سعر اليورو وتكلفة الشحن بالكيلو والرحلات ومراجعة الأوزان بتطلع لكل منتج سعر مظبوط."],
+["doc","Reads purchase invoices","بيقرا فواتير الشراء","AI reads store receipts from a photo or PDF and adds the bought items by itself.","الذكاء الاصطناعي بيقرا فواتير المحلات من صورة أو PDF ويضيف المنتجات المشتراة لوحده."],
+["camera","AI product entry and studio photos","إضافة منتجات بالذكاء الاصطناعي","One photo removes the background, makes a studio picture and fills the name, brand, size and details.","صورة واحدة بتشيل الخلفية وتعمل صورة ستوديو وتملا الاسم والماركة والحجم والتفاصيل."],
+["tag","Retail, wholesale and discounts","قطاعي وجملة وخصومات","Two prices per product, a separate wholesale page, discounts and special orders.","سعرين لكل منتج، وصفحة جملة منفصلة، وخصومات، وطلبات خاصة."],
+["wallet","Invoices and payments","الفواتير والمدفوعات","Invoices on WhatsApp, delivery fees, payments received, money still owed and an “order ready” message.","فواتير على الواتساب، ورسوم توصيل، والمدفوع والمتبقي، ورسالة «طلبك جاهز»."],
+["chart","Reports and Excel","تقارير وإكسيل","Sales, profit, collected and owed money and best sellers by month, with Excel export.","المبيعات والربح والمحصّل والمتبقي والأكثر مبيعًا كل شهر، مع تصدير لإكسيل."],
+["robot","Social media robot","روبوت السوشيال ميديا","Designs posts from the real product photo with correct Arabic text, ready for Facebook and Instagram.","بيصمم بوستات من صورة المنتج الحقيقية بكتابة عربي سليمة، جاهزة لفيسبوك وإنستجرام."],
+["cloud","Live website and backups","موقع محدّث ونسخ احتياطي","The website updates itself seconds after any change; the data is backed up automatically.","الموقع بيتحدث لوحده بعد أي تعديل بثواني، والبيانات بتتحفظ نسخة احتياطية أوتوماتيك."]],
+tags:[["Web","ويب"],["Android","أندرويد"],["Windows","ويندوز"],["AI","ذكاء اصطناعي"]],link:["https://lumia-store.github.io","Visit the live shop","زور المتجر"]},
+{dev:"pos",name:["Drinks store","محل مشروبات"],kind:["Cashier system · Inventory · Delivery · Online menu","نظام كاشير · مخزون · توصيل · منيو أونلاين"],
+prob:["A soft drinks store needed fast selling at the counter, full control of stock, tracked deliveries and an end of day that always matches the cash.","محل مشروبات ومياه غازية كان محتاج بيع سريع على الكاشير، وتحكم كامل في المخزون، وتوصيل متتبع، وتقفيل آخر اليوم يطابق الفلوس دايمًا."],
+f:[["cart","Fast selling","بيع سريع","Barcode or product cards with pictures, selling by piece or carton, held bills and returns.","بالباركود أو كروت المنتجات بالصور، بيع بالقطعة أو الكرتونة، فواتير معلقة ومرتجعات."],
+["printer","Payments and receipts","الدفع والفواتير","Cash, card, wallet or InstaPay; receipt printer and cash drawer connected.","كاش أو فيزا أو محفظة أو إنستاباي، وطابعة فواتير ودُرج فلوس متوصلين."],
+["box","Full stock and inventory","مخزون وجرد كامل","Shop floor and warehouse, transfers between them, stock counts and stock-in by carton.","صالة البيع والمخزن، والتحويل بينهم، والجرد، والاستلام بالكرتونة."],
+["bell","Stock alerts","تنبيهات المخزون","Alerts for minimum stock, reorder level and expiry dates.","تنبيهات للحد الأدنى ونقطة إعادة الطلب وتواريخ الصلاحية."],
+["truck","Delivery and driver tracking","التوصيل وتتبع السواقين","Delivery areas and fees, a drivers list, and cash on delivery tracked until the driver hands it in.","مناطق ورسوم توصيل، وقائمة سواقين، وفلوس التحصيل متتبعة لحد ما السواق يسلمها."],
+["pin","Orders with the customer's location","الطلب بموقع العميل","Each driver gets the order and the customer's map location on Telegram.","كل سواق بيوصله الطلب وموقع العميل على الخريطة على تليجرام."],
+["qr","Online menu and ordering","منيو وطلب أونلاين","A price list website with a QR code that customers install as an app and order from; orders arrive in the system.","موقع أسعار بكود QR العملاء بيثبتوه كتطبيق ويطلبوا منه، والطلبات بتوصل على السيستم."],
+["clock","Shifts and cash control","الورديات والخزنة","Blind cash count, cash in and out, X and Z reports and a business day that runs past midnight.","عدّ الخزنة من غير ما الكاشير يشوف المتوقع، وإيداع وصرف، وتقارير X وZ، ويوم شغل بيعدّي نص الليل."],
+["chart","Reports and owner dashboard","تقارير ولوحة صاحب المحل","Sales, products, cashiers, drivers and stock reports, plus a dashboard and reports on the owner's phone.","تقارير المبيعات والمنتجات والكاشيرية والسواقين والمخزون، ولوحة وتقارير على موبايل صاحب المحل."],
+["lock","Users and permissions","المستخدمين والصلاحيات","Cashier, manager and owner roles, a manager PIN for discounts and returns, and an activity log.","صلاحيات للكاشير والمدير والمالك، ورقم سري للمدير للخصم والمرتجع، وسجل لكل العمليات."],
+["offline","Works without internet","شغال من غير إنترنت","Selling never stops when the internet does; online services catch up when it returns.","البيع عمره ما يقف لو النت فصل، والخدمات الأونلاين بتكمل لما يرجع."],
+["cloud","Safe data","بيانات في أمان","Automatic backups on the PC and an encrypted copy on Google Drive.","نسخ احتياطي أوتوماتيك على الجهاز، ونسخة مشفرة على جوجل درايف."]],
+tags:[["Windows","ويندوز"],["POS","كاشير"],["Inventory","مخزون"],["Delivery","توصيل"]]},
+{dev:"ms",badge:["In development","تحت التطوير"],name:["Masna'i <span dir=\"rtl\" lang=\"ar\" class=\"alt\">مصنعي</span>","مصنعي"],kind:["Factory management app for plastic recycling","تطبيق إدارة لمصانع إعادة تدوير البلاستيك"],
+prob:["Small plastic sorting, crushing and washing workshops run on paper and memory. The owner needs to know cost, yield and profit, and workers need something as easy as WhatsApp.","ورش الفرز والكسارة والغسيل الصغيرة شغالة بالورق والذاكرة. صاحب المصنع محتاج يعرف التكلفة والتصافي والربح، والعمال محتاجين حاجة سهلة زي الواتساب."],
+f:[["layers","Production by stage","الإنتاج بالمراحل","Sorting, crusher, washing line, drying, pelletizing and pressing, with inputs, outputs, yield % and loss for each stage.","فرز وكسارة وخط غسيل ونشافة وخرازة وكبس، بالداخل والخارج ونسبة التصافي والهالك لكل مرحلة."],
+["list","Materials in market names","الخامات بأسماء السوق","Form, type, colour and grade, like “mafrom high blue pure”, with ready presets.","الشكل والنوع واللون والدرجة، زي «مفروم هاي أزرق بيور»، بقوالب جاهزة."],
+["scale","Purchases on the weighbridge","المشتريات على الميزان","Gross minus tare, bags and deductions; price per kg, ton or whole load; credit and deposits.","القائم ناقص الفارغ والشكاير والخصم، والسعر بالكيلو أو الطن أو النقلة، والآجل والعربون."],
+["cart","Sales and processing for others","المبيعات والمصنعية","Sales by kg or ton with stock warnings, returns and quality deductions, and processing other people's material.","بيع بالكيلو أو الطن مع تنبيه المخزون، والمرتجع وخصم الجودة، والتشغيل للغير بالمصنعية."],
+["users","Workers and weekly payroll","العمال والقبض الأسبوعي","Pay by day or by kg sorted, half days, overtime, advances and a Saturday-to-Friday payroll.","يومية أو بالكيلو، ونص يوم، وإضافي، وسُلف، وقبض أسبوعي من السبت للجمعة."],
+["box","Stock and stock-take","المخزون والجرد","Stock at every stage with average cost per kg, stock-take differences and a price list.","المخزون في كل مرحلة بمتوسط تكلفة الكيلو، وفروق الجرد، وقائمة أسعار."],
+["wallet","Expenses, debts and cash","المصاريف والديون والخزنة","Every expense including electricity per ton, who owes what, and the cash in hand.","كل المصاريف ومنها الكهربا للطن، ومين عليه فلوس، والفلوس اللي في الخزنة."],
+["chart","Profit reports on WhatsApp","تقارير الربح على الواتساب","Profit, yield per stage compared with last period and profit per material, shared in one tap.","الربح، والتصافي لكل مرحلة مقارنة بالفترة اللي فاتت، وربح كل خامة، تتبعت بضغطة."],
+["offline","Offline on the phone","شغال على الموبايل من غير نت","Data stays on the device, with a backup file that opens on any phone or PC.","البيانات على الجهاز، وملف نسخة احتياطية يفتح على أي موبايل أو كمبيوتر."]],
 tags:[["Android","أندرويد"],["Arabic","عربي"],["Manufacturing","تصنيع"]]}],
 steps:[
 ["M21 12a9 9 0 01-13.5 7.8L3 21l1.2-4.5A9 9 0 1121 12z","We listen","بنسمعك","A short chat about your business, your customers and what wastes your time.","كلام قصير عن شغلك وعملائك وإيه اللي بيضيّع وقتك."],
@@ -305,6 +349,7 @@ steps:[
 ["M16 18l6-6-6-6M8 6l-6 6 6 6","We build","بنبني","Working versions early, tested on your real phones, computers and printers.","نسخ شغالة بدري، متجربة على موبايلاتك وأجهزتك وطابعاتك الحقيقية."],
 ["M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z","We stay","بنفضل معاك","Training for your team, then support and upgrades as your business grows.","تدريب لفريقك، وبعدين دعم وتطويرات مع نمو شغلك."]],
 promise:[["Your language","بلغتك","Arabic and English, right-to-left done properly.","عربي وإنجليزي، واتجاه يمين لشمال مظبوط."],["Mobile first","الموبايل أولًا","Designed for the phone your customers hold.","مصمم للموبايل اللي في إيد عملائك."],["Works offline","شغال أوفلاين","Shop and factory systems keep going without internet.","أنظمة المحلات والمصانع تكمل من غير إنترنت."],["Clear price","سعر واضح","Scope, changes and support agreed in writing.","المطلوب والتعديلات والدعم متفق عليهم كتابة."]]};
+const IC={globe:"M12 21a9 9 0 100-18 9 9 0 000 18zM3 12h18M12 3c3 3.5 3 14.5 0 18M12 3c-3 3.5-3 14.5 0 18",chat:"M21 12a9 9 0 01-13.5 7.8L3 21l1.2-4.5A9 9 0 1121 12z",cart:"M6 6h15l-1.5 9h-12zM6 6L5 3H2M9 20a1 1 0 100-2 1 1 0 000 2zM18 20a1 1 0 100-2 1 1 0 000 2z",box:"M21 8l-9-5-9 5v8l9 5 9-5zM3 8l9 5 9-5M12 13v8",scale:"M12 3v18M7 21h10M5 7h14M5 7l-3 7a3 3 0 006 0zM19 7l-3 7a3 3 0 006 0z",doc:"M6 2h9l5 5v15H6zM14 2v6h6M9 13h6M9 17h6",camera:"M3 8h4l2-3h6l2 3h4v12H3zM12 17a4 4 0 100-8 4 4 0 000 8z",tag:"M3 12V3h9l9 9-9 9zM7.5 7.5h.01",wallet:"M3 7h18v13H3zM3 7l3-4h12l3 4M16 14h2",chart:"M4 20V10M10 20V4M16 20v-7M22 20H2",robot:"M5 8h14v11H5zM12 4v4M9 13h.01M15 13h.01M9 16h6M2 12v3M22 12v3",cloud:"M7 18h10a4 4 0 00.5-8A6 6 0 006 9a4.5 4.5 0 001 9zM12 11v5M9.5 13.5L12 11l2.5 2.5",printer:"M6 9V2h12v7M6 18H4v-7h16v7h-2M6 14h12v8H6z",bell:"M6 9a6 6 0 1112 0c0 6 3 7 3 7H3s3-1 3-7M10 20a2 2 0 004 0",truck:"M3 6h11v10H3zM14 10h4l3 3v3h-7M7 19a2 2 0 100-4 2 2 0 000 4zM17 19a2 2 0 100-4 2 2 0 000 4z",pin:"M12 21s7-6.2 7-12a7 7 0 10-14 0c0 5.8 7 12 7 12zM12 11a2 2 0 100-4 2 2 0 000 4z",qr:"M3 3h7v7H3zM14 3h7v7h-7zM3 14h7v7H3zM14 14h3v3h-3zM20 14v.01M20 20h-3v-3M14 20h.01",clock:"M12 21a9 9 0 100-18 9 9 0 000 18zM12 7v5l3 2",lock:"M5 11h14v10H5zM8 11V7a4 4 0 018 0v4",offline:"M2 2l20 20M8.5 16.5a5 5 0 017 0M5 12.6a10 10 0 015.2-2.8M19 12.6a10 10 0 00-2.2-1.7M2 8.8a15 15 0 014.2-2.6M12 20h.01",layers:"M12 3l9 5-9 5-9-5zM3 13l9 5 9-5",list:"M9 6h12M9 12h12M9 18h12M4 6h.01M4 12h.01M4 18h.01",users:"M16 20v-2a4 4 0 00-4-4H6a4 4 0 00-4 4v2M9 10a4 4 0 100-8 4 4 0 000 8zM22 20v-2a4 4 0 00-3-3.9M16 2.1a4 4 0 010 7.8"};
 const $=s=>document.querySelector(s);
 const scr={
 lu:()=>`<div class="lu" dir="ltr"><div class="lu-top">LUMIA<i></i></div><div class="lu-ban">German care, delivered<small>Shop now · Order on WhatsApp</small></div><div class="lu-grid">${[["#f7d9e0","#e58fa6","EGP 350"],["#e5ecfb","#7fa2e6","EGP 280"],["#eaf6ee","#6cc08c","EGP 195"],["#f6eee2","#d6a45f","EGP 420"]].map(p=>`<div class="lu-p"><b style="background:${p[0]};color:${p[1]}"></b>Care item<em>${p[2]}</em></div>`).join('')}</div><div class="lu-wa">Order on WhatsApp</div></div>`,
@@ -322,7 +367,10 @@ function render(){
 $('#track').innerHTML=[0,1].map(()=>T.tick.map(t=>`<span>${L(t)}</span>`).join('')).join('');
 $('#svc').innerHTML=T.svc.map((s,i)=>`<div class="card rv" style="--i:${i%3}"><div class="ico"><svg viewBox="0 0 24 24"><path d="${s[0]}"/></svg></div><h3>${lang==='en'?s[1]:s[2]}</h3><p>${lang==='en'?s[3]:s[4]}</p></div>`).join('');
 $('#cases').innerHTML=T.cases.map(c=>{const vis=c.dev==='pos'?`<div class="mini"><div style="position:absolute;left:2em;top:1em">${laptop('pos')}</div></div>`:`<div class="mini ph">${orbit('o'+c.dev,250,90)}<div class="dev" style="left:5.5em;top:0"><div class="float">${phone(c.dev)}</div></div></div>`;
-return`<article class="case"><div class="show rv"><div class="stagebox">${vis}</div></div><div class="rv" style="--i:1">${c.badge?`<span class="badge">${L(c.badge)}</span>`:''}<div class="kicker" style="margin:12px 0 0">${L(c.kind)}</div><h3>${L(c.name)}</h3><p class="prob">${L(c.prob)}</p><ul>${c.pts.map(p=>`<li>${L(p)}</li>`).join('')}</ul><div class="tag">${c.tags.map(t=>`<span>${L(t)}</span>`).join('')}</div>${c.link?`<div><a class="btn g" href="${c.link[0]}" target="_blank" rel="noopener">${lang==='en'?c.link[1]:c.link[2]} <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7M8 7h9v9"/></svg></a></div>`:''}</div></article>`}).join('');
+const en=lang==='en';
+return`<article class="case"><div class="case-top"><div class="show rv"><div class="stagebox">${vis}</div></div><div class="info rv" style="--i:1">${c.badge?`<span class="badge">${L(c.badge)}</span>`:''}<p class="ckind">${L(c.kind)}</p><h3>${L(c.name)}</h3><p class="prob">${L(c.prob)}</p><div class="tag">${c.tags.map(t=>`<span>${L(t)}</span>`).join('')}</div>${c.link?`<a class="btn g" href="${c.link[0]}" target="_blank" rel="noopener"><span>${en?c.link[1]:c.link[2]}</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7M8 7h9v9"/></svg></a>`:''}</div></div>
+<p class="fhead rv">${en?'What it does':'بيعمل إيه'} <span>· ${c.f.length} ${en?'features':'ميزة'}</span></p><div class="feats">${c.f.map((f,i)=>`<div class="feat rv" style="--i:${i%3}"><div class="fi"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="${IC[f[0]]}"/></svg><h4>${en?f[1]:f[2]}</h4></div><p>${en?f[3]:f[4]}</p></div>`).join('')}</div>${c.f.length>6?`<button class="more" aria-expanded="false"><span>${en?`Show all ${c.f.length} features`:`اعرض كل الـ ${c.f.length} ميزة`}</span><span>${en?'Show fewer':'اعرض أقل'}</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg></button>`:''}</article>`}).join('');
+document.querySelectorAll('.more').forEach(btn=>btn.addEventListener('click',()=>{const c=btn.closest('.case'),o=c.classList.toggle('open');btn.setAttribute('aria-expanded',o);if(o)c.querySelectorAll('.feat').forEach(f=>f.classList.add('on'))}));
 $('#steps').innerHTML='<div class="rail"><i></i></div>'+T.steps.map((s,i)=>`<div class="step rv" style="--i:${i}"><div class="dot"><svg viewBox="0 0 24 24"><path d="${s[0]}"/></svg></div><h3>${lang==='en'?s[1]:s[2]}</h3><p>${lang==='en'?s[3]:s[4]}</p></div>`).join('');
 $('#promise').innerHTML=T.promise.map(p=>`<div><b>${lang==='en'?p[0]:p[1]}</b><span>${lang==='en'?p[2]:p[3]}</span></div>`).join('');
 document.querySelectorAll('[data-k]').forEach(el=>{const k=el.dataset.k;if(!el.dataset.en)el.dataset.en=el.innerHTML;el.innerHTML=lang==='ar'&&AR[k]?AR[k]:el.dataset.en});
