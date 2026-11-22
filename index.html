@@ -545,7 +545,7 @@ function storyUpd(force){
 }
 (function loop(){storyUpd();requestAnimationFrame(loop)})();
 function lock(at){
-  locked=true;ch=at;window.MINOVA_CH=ch;cool=performance.now()+1150;if(window.__wheelUsed)window.__wheelUsed();
+  locked=true;ch=at;window.MINOVA_CH=ch;cool=performance.now()+700;if(window.__wheelUsed)window.__wheelUsed();
   const y=stTop();
   if(lenis){lenis.stop();lenis.scrollTo(y,{immediate:true,force:true})}
   H.style.overflow='hidden';D.body.style.overflow='hidden';scrollTo(0,y);
@@ -558,18 +558,19 @@ function unlock(dir){
   if(lenis){lenis.start();lenis.scrollTo(y,{duration:1.2})}else scrollTo({top:y,behavior:'smooth'});
   navUntil=performance.now()+1500;
 }
+function animDone(){const ph=window.MINOVA_PH,fresh=performance.now()-(window.MINOVA_PHT||0)<1500;return !fresh||typeof ph!=='number'||Math.abs(ph-ch)<.04}
 function step(dir){
-  const now=performance.now();if(now<cool)return;
+  const now=performance.now();if(now<cool||!animDone())return;
   if(dir>0&&ch>=4){unlock(1);return}
   if(dir<0&&ch<=0){unlock(-1);return}
-  ch+=dir;window.MINOVA_CH=ch;cool=now+1150;
+  ch+=dir;window.MINOVA_CH=ch;cool=now+450;
 }
 if(anim&&storyEl&&!still){
   let prevY=scrollY;
   const watch=()=>{const y=scrollY,t=stTop();
     if(!locked&&performance.now()>navUntil&&!H.classList.contains('menu-open')){
-      if(prevY<t-1&&y>=t-1)lock(0);           // arrived from above: start at chapter 1
-      else if(prevY>t+1&&y<=t+1)lock(4);      // came back from below: start at the end
+      if(prevY<t-14&&y>=t-14)lock(0);           // arrived from above: start at chapter 1
+      else if(prevY>t+14&&y<=t+14)lock(4);      // came back from below: start at the end
     }
     prevY=locked?t:y};
   if(lenis)lenis.on('scroll',watch);addEventListener('scroll',watch,{passive:true});
@@ -578,7 +579,7 @@ if(anim&&storyEl&&!still){
   addEventListener('wheel',e=>{const now=performance.now(),fresh=now-lastW>220;lastW=now;
     if(!locked)return;e.preventDefault();
     if(fresh){used=false;acc=0}acc+=e.deltaY;
-    if(!used&&Math.abs(acc)>30&&now>=cool){used=true;step(Math.sign(acc))}},{passive:false});
+    if(!used&&Math.abs(acc)>30&&now>=cool&&animDone()){used=true;step(Math.sign(acc))}},{passive:false});
   window.__wheelUsed=()=>{used=true};
   // touch: one swipe = one chapter
   let ty=null;
@@ -863,7 +864,7 @@ const storyOn=()=>document.documentElement.classList.contains('anim')&&storyEl;
 /* --- where the M sits in each section --- */
 const wide=()=>innerWidth/innerHeight>1.05;
 const S={
- hero:()=>wide()?{x:2.35,y:.05,z:0,s:.9,ry:-.12,rx:.04,o:1}:{x:0,y:1.72,z:0,s:.54,ry:0,rx:.05,o:1},
+ hero:()=>wide()?(innerWidth/innerHeight<1.9?{x:2.62,y:.05,z:0,s:.8,ry:-.12,rx:.04,o:1}:{x:2.35,y:.05,z:0,s:.9,ry:-.12,rx:.04,o:1}):{x:0,y:1.72,z:0,s:.54,ry:0,rx:.05,o:1},
  story:()=>wide()?{x:1.65,y:-.05,z:0,s:.95,ry:0,rx:0,o:1}:{x:0,y:1.2,z:0,s:.5,ry:0,rx:0,o:1},
  services:()=>wide()?{x:2.9,y:1.2,z:-3,s:.7,ry:-.45,rx:-.2,o:.5}:{x:0,y:2.6,z:-4,s:.5,ry:-.4,rx:-.2,o:0},
  work:()=>wide()?{x:0,y:0,z:-6,s:1.1,ry:.25,rx:.1,o:.22}:{x:0,y:2.6,z:-4,s:.5,ry:.25,rx:.1,o:0},
@@ -936,8 +937,8 @@ function tick(){
     const vis=Math.min(1,Math.max(0,(innerHeight-r.top)/(innerHeight*.7)))*Math.min(1,Math.max(0,r.bottom/(innerHeight*.6)));
     const tgt=typeof window.MINOVA_CH==='number'?window.MINOVA_CH:0;
     if(vis<.02)ph=tgt;                                  // off screen: stay in step with the page
-    else{const rate=still?99:1.1;ph+=Math.max(-dt*rate,Math.min(dt*rate,tgt-ph))}  // on screen: one steady change at a time
-    window.MINOVA_PH=vis>.02?ph:null;
+    else{const rdt=Math.min(.5,t-(window.__phT||t));const rate=still?99:1.15;ph+=Math.max(-rdt*rate,Math.min(rdt*rate,tgt-ph))}  // on screen: one steady change at a time
+    window.__phT=t;window.MINOVA_PH=vis>.02?ph:null;window.MINOVA_PHT=performance.now();
     pMat.uniforms.uP.value=ph;pMat.uniforms.uT.value=t;
     const end=ss2(Math.min(1,Math.max(0,(ph-3.8)/.2)));
     const pa=vis*(1-end);pMat.uniforms.uA.value=pa;pts.visible=pa>.01;
