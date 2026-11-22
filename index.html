@@ -161,9 +161,9 @@ h2{font-size:clamp(34px,4.6vw,68px);line-height:1.02;letter-spacing:-.035em;font
 .anim .ch{grid-area:1/1;opacity:0;transform:translateY(-18px);transition:opacity .28s ease,transform .3s ease;align-self:center;pointer-events:none}
 .anim .ch.on{opacity:1;transform:none;transition:opacity .55s ease .3s,transform .9s var(--ease) .3s;pointer-events:auto}
 .anim .ch:not(.on){transform:translateY(-18px)}
-.snapy{scroll-snap-type:y proximity}
-.story{--sh:520vh}.anim .story{height:var(--sh)}
-.snap{position:absolute;left:0;width:1px;height:1px;top:calc(var(--i) * (var(--sh) - 100vh) * .24);scroll-snap-align:start;scroll-snap-stop:always;pointer-events:none}
+.skipb{display:none}
+.anim .skipb{display:inline-flex;align-items:center;gap:8px;position:absolute;inset-inline-end:max(5vw,16px);bottom:calc(7vh - 14px);min-height:44px;padding:0 16px;border-radius:99px;border:1px solid var(--line);color:var(--mute);font-size:14px;background:rgba(3,8,23,.5)}
+.skipb:hover{color:var(--ink);border-color:rgba(170,190,255,.35)}
 .ch small{display:flex;align-items:center;gap:12px;font-size:14px;font-weight:600;color:var(--sky);margin-bottom:18px}
 .ch small::before{content:"";width:28px;height:1px;background:currentColor}
 .ch h2{font-size:clamp(32px,4.2vw,62px);max-width:14ch;margin:0 0 18px}
@@ -173,7 +173,7 @@ h2{font-size:clamp(34px,4.6vw,68px);line-height:1.02;letter-spacing:-.035em;font
 .sdots i{width:30px;height:3px;border-radius:3px;background:var(--line);transition:background .5s,width .5s}
 .sdots i.on{width:54px;background:linear-gradient(90deg,var(--blue),var(--violet))}
 @media(max-width:760px){
-  .story{--sh:470vh}
+  .anim .skipb{bottom:calc(6vh - 14px)}
   .anim .story-in{align-items:flex-end;padding-bottom:13vh}
   .anim .chs{width:100%}
   .ch h2{font-size:clamp(30px,8.4vw,40px)}
@@ -360,6 +360,7 @@ footer{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-betw
     <div class="story-in">
       <div class="chs" id="chs"></div>
       <div class="sdots" id="sdots" aria-hidden="true"></div>
+      <button class="skipb" id="skip" type="button" data-k="skp">Skip ↓</button>
     </div>
   </section>
 
@@ -415,7 +416,7 @@ const G=window.gsap,ST=window.ScrollTrigger;
 const anim=!!(G&&ST)&&!still;
 if(anim){H.classList.add('anim');G.registerPlugin(ST)}
 
-const AR={skip:"انتقل إلى المحتوى",top:"العودة للأعلى ↑",n1:"خدماتنا",n2:"أعمالنا",n3:"منهجيتنا",n4:"تواصل معنا",wa:"واتساب",
+const AR={skp:"تخطَّ ↓",skip:"انتقل إلى المحتوى",top:"العودة للأعلى ↑",n1:"خدماتنا",n2:"أعمالنا",n3:"منهجيتنا",n4:"تواصل معنا",wa:"واتساب",
 kick:"استوديو رقمي للمتاجر والمصانع الصغيرة في مصر",
 h1:"برمجيات مصممة حول طريقة عملك.",
 lead:"تصمم MINOVA وتطوّر المواقع الإلكترونية وتطبيقات الهاتف وأنظمة الإدارة لمتاجر التجزئة والمصانع، بوضوح واعتمادية وسهولة استخدام لكل فرد في فريقك، باللغتين العربية والإنجليزية.",
@@ -528,23 +529,68 @@ function build(){
   ST.refresh();
 }
 
-/* story chapters follow the scroll (the 3D scene reads the same progress) */
-let chOn=-1;
+/* story: when it reaches the top, the page holds still and each gesture moves exactly one chapter.
+   Input during a transition is ignored, so a strong swipe can never skip it. After the last chapter the page carries on. */
+let chOn=-1,ch=0,locked=false,cool=0,navUntil=0;
+const storyEl=$('#story'),stTop=()=>storyEl.getBoundingClientRect().top+scrollY;
+window.MINOVA_CH=0;
 function storyUpd(force){
-  if(!anim)return;const st=$('#story');if(!st)return;
-  const r=st.getBoundingClientRect(),pr=Math.min(1,Math.max(0,-r.top/Math.max(1,r.height-innerHeight)));
-  const ph=typeof window.MINOVA_PH==='number'?window.MINOVA_PH:Math.min(1,pr/.96)*4;   // follow the animation, not the raw scroll
+  if(!anim||!storyEl)return;
+  if(!locked)window.MINOVA_CH=storyEl.getBoundingClientRect().top>0?0:4;
+  const ph=typeof window.MINOVA_PH==='number'?window.MINOVA_PH:window.MINOVA_CH;   // the text follows the animation
   const c=Math.max(0,Math.min(4,Math.round(ph)));
   if(c===chOn&&!force)return;chOn=c;
   $$('#chs .ch').forEach((e,i)=>e.classList.toggle('on',i===c));
   $$('#sdots i').forEach((e,i)=>e.classList.toggle('on',i===c));
 }
 (function loop(){storyUpd();requestAnimationFrame(loop)})();
-/* snap to chapters: phones use CSS snap stops (a strong swipe stops at the next chapter); mouse and trackpad settle smoothly */
-const chapPos=()=>{const st=$('#story'),top=st.getBoundingClientRect().top+scrollY,L=st.offsetHeight-innerHeight;return [0,1,2,3,4].map(i=>top+L*.96*i/4)};
-if(anim&&lenis){let tm;lenis.on('scroll',()=>{clearTimeout(tm);tm=setTimeout(()=>{const st=$('#story'),r=st.getBoundingClientRect();if(r.top>2||r.bottom<innerHeight-2)return;
-  const P=chapPos(),y=scrollY;let best=P[0];P.forEach(v=>{if(Math.abs(v-y)<Math.abs(best-y))best=v});if(Math.abs(best-y)>3)lenis.scrollTo(best,{duration:.8})},160)})}
-if(anim&&!lenis){H.classList.add('snapy');const st=$('#story');[0,1,2,3,4].forEach(i=>{const m=D.createElement('i');m.className='snap';m.style.setProperty('--i',i);st.prepend(m)})}
+function lock(at){
+  locked=true;ch=at;window.MINOVA_CH=ch;cool=performance.now()+1150;if(window.__wheelUsed)window.__wheelUsed();
+  const y=stTop();
+  if(lenis){lenis.stop();lenis.scrollTo(y,{immediate:true,force:true})}
+  H.style.overflow='hidden';D.body.style.overflow='hidden';scrollTo(0,y);
+  storyEl.classList.add('held');
+}
+function unlock(dir){
+  locked=false;storyEl.classList.remove('held');
+  H.style.overflow='';D.body.style.overflow='';
+  const y=stTop()+(dir>0?innerHeight:-innerHeight*.85);
+  if(lenis){lenis.start();lenis.scrollTo(y,{duration:1.2})}else scrollTo({top:y,behavior:'smooth'});
+  navUntil=performance.now()+1500;
+}
+function step(dir){
+  const now=performance.now();if(now<cool)return;
+  if(dir>0&&ch>=4){unlock(1);return}
+  if(dir<0&&ch<=0){unlock(-1);return}
+  ch+=dir;window.MINOVA_CH=ch;cool=now+1150;
+}
+if(anim&&storyEl&&!still){
+  let prevY=scrollY;
+  const watch=()=>{const y=scrollY,t=stTop();
+    if(!locked&&performance.now()>navUntil&&!H.classList.contains('menu-open')){
+      if(prevY<t-1&&y>=t-1)lock(0);           // arrived from above: start at chapter 1
+      else if(prevY>t+1&&y<=t+1)lock(4);      // came back from below: start at the end
+    }
+    prevY=locked?t:y};
+  if(lenis)lenis.on('scroll',watch);addEventListener('scroll',watch,{passive:true});
+  // mouse wheel / trackpad: one continuous stream of wheel events counts as one gesture
+  let lastW=0,used=false,acc=0;
+  addEventListener('wheel',e=>{const now=performance.now(),fresh=now-lastW>220;lastW=now;
+    if(!locked)return;e.preventDefault();
+    if(fresh){used=false;acc=0}acc+=e.deltaY;
+    if(!used&&Math.abs(acc)>30&&now>=cool){used=true;step(Math.sign(acc))}},{passive:false});
+  window.__wheelUsed=()=>{used=true};
+  // touch: one swipe = one chapter
+  let ty=null;
+  addEventListener('touchstart',e=>{if(locked)ty=e.touches[0].clientY},{passive:true});
+  addEventListener('touchmove',e=>{if(locked)e.preventDefault()},{passive:false});
+  addEventListener('touchend',e=>{if(!locked||ty===null)return;const dy=ty-e.changedTouches[0].clientY;ty=null;if(Math.abs(dy)>36)step(Math.sign(dy))},{passive:true});
+  addEventListener('keydown',e=>{if(!locked)return;const k=e.key;
+    if(['ArrowDown','PageDown',' '].includes(k)){e.preventDefault();step(1)}
+    else if(['ArrowUp','PageUp'].includes(k)){e.preventDefault();step(-1)}
+    else if(k==='Escape'||k==='End'){unlock(1)}});
+  $('#skip').addEventListener('click',()=>{if(locked)unlock(1);else{navUntil=performance.now()+1500;const y=stTop()+innerHeight;lenis?lenis.scrollTo(y,{duration:1}):scrollTo({top:y,behavior:'smooth'})}});
+}
 
 /* marquee leans with scroll speed */
 if(anim&&lenis){const sk=$('.mq-skew');let v=0;
@@ -586,7 +632,7 @@ function bindHover(){
 }
 
 /* smooth anchors */
-D.addEventListener('click',e=>{const a=e.target.closest('a[href^="#"]');if(!a)return;e.preventDefault();menu(false);
+D.addEventListener('click',e=>{const a=e.target.closest('a[href^="#"]');if(!a)return;e.preventDefault();menu(false);navUntil=performance.now()+2200;if(locked){locked=false;storyEl.classList.remove('held');H.style.overflow='';D.body.style.overflow='';if(lenis)lenis.start()}
   const id=a.getAttribute('href').slice(1),t=(id==='home'||id==='main')?0:D.getElementById(id);
   if(lenis)lenis.scrollTo(t,{offset:0,duration:1.4,easing:x=>1-Math.pow(1-x,4)});else (t?t.scrollIntoView({behavior:still?'auto':'smooth'}):scrollTo({top:0,behavior:still?'auto':'smooth'}));
   const f=t||$('#main');if(f){if(!f.hasAttribute('tabindex'))f.setAttribute('tabindex','-1');f.focus({preventScroll:true})}});
@@ -888,9 +934,9 @@ function tick(){
   if(storyOn()){
     const r=storyEl.getBoundingClientRect(),sp=Math.min(1,Math.max(0,-r.top/Math.max(1,r.height-innerHeight)));
     const vis=Math.min(1,Math.max(0,(innerHeight-r.top)/(innerHeight*.7)))*Math.min(1,Math.max(0,r.bottom/(innerHeight*.6)));
-    const tgt=Math.min(1,sp/.96)*4;
+    const tgt=typeof window.MINOVA_CH==='number'?window.MINOVA_CH:0;
     if(vis<.02)ph=tgt;                                  // off screen: stay in step with the page
-    else{const rate=still?99:(Math.abs(tgt-ph)>1.5?1.9:1.15);ph+=Math.max(-dt*rate,Math.min(dt*rate,tgt-ph))}  // on screen: one steady change at a time
+    else{const rate=still?99:1.1;ph+=Math.max(-dt*rate,Math.min(dt*rate,tgt-ph))}  // on screen: one steady change at a time
     window.MINOVA_PH=vis>.02?ph:null;
     pMat.uniforms.uP.value=ph;pMat.uniforms.uT.value=t;
     const end=ss2(Math.min(1,Math.max(0,(ph-3.8)/.2)));
