@@ -154,13 +154,16 @@ h2{font-size:clamp(34px,4.6vw,68px);line-height:1.02;letter-spacing:-.035em;font
 
 /* story: chapters stay pinned while the particles change shape */
 .story{position:relative}
-.anim .story{height:560vh}
 .story-in{padding:90px max(5vw,16px)}
 .anim .story-in{position:sticky;top:0;height:100vh;height:100svh;padding:0 max(5vw,16px);display:flex;align-items:center;overflow:hidden}
 .chs{display:grid;gap:56px;max-width:560px}
 .anim .chs{gap:0;width:min(560px,44vw)}
-.anim .ch{grid-area:1/1;opacity:0;transform:translateY(34px);transition:opacity .6s ease,transform .9s var(--ease);align-self:center}
-.anim .ch.on{opacity:1;transform:none}
+.anim .ch{grid-area:1/1;opacity:0;transform:translateY(-18px);transition:opacity .28s ease,transform .3s ease;align-self:center;pointer-events:none}
+.anim .ch.on{opacity:1;transform:none;transition:opacity .55s ease .3s,transform .9s var(--ease) .3s;pointer-events:auto}
+.anim .ch:not(.on){transform:translateY(-18px)}
+.snapy{scroll-snap-type:y proximity}
+.story{--sh:520vh}.anim .story{height:var(--sh)}
+.snap{position:absolute;left:0;width:1px;height:1px;top:calc(var(--i) * (var(--sh) - 100vh) * .24);scroll-snap-align:start;scroll-snap-stop:always;pointer-events:none}
 .ch small{display:flex;align-items:center;gap:12px;font-size:14px;font-weight:600;color:var(--sky);margin-bottom:18px}
 .ch small::before{content:"";width:28px;height:1px;background:currentColor}
 .ch h2{font-size:clamp(32px,4.2vw,62px);max-width:14ch;margin:0 0 18px}
@@ -170,7 +173,7 @@ h2{font-size:clamp(34px,4.6vw,68px);line-height:1.02;letter-spacing:-.035em;font
 .sdots i{width:30px;height:3px;border-radius:3px;background:var(--line);transition:background .5s,width .5s}
 .sdots i.on{width:54px;background:linear-gradient(90deg,var(--blue),var(--violet))}
 @media(max-width:760px){
-  .anim .story{height:470vh}
+  .story{--sh:470vh}
   .anim .story-in{align-items:flex-end;padding-bottom:13vh}
   .anim .chs{width:100%}
   .ch h2{font-size:clamp(30px,8.4vw,40px)}
@@ -530,12 +533,18 @@ let chOn=-1;
 function storyUpd(force){
   if(!anim)return;const st=$('#story');if(!st)return;
   const r=st.getBoundingClientRect(),pr=Math.min(1,Math.max(0,-r.top/Math.max(1,r.height-innerHeight)));
-  const c=Math.min(4,Math.floor(Math.min(1,pr/.94)*4+.32));
+  const ph=typeof window.MINOVA_PH==='number'?window.MINOVA_PH:Math.min(1,pr/.96)*4;   // follow the animation, not the raw scroll
+  const c=Math.max(0,Math.min(4,Math.round(ph)));
   if(c===chOn&&!force)return;chOn=c;
   $$('#chs .ch').forEach((e,i)=>e.classList.toggle('on',i===c));
   $$('#sdots i').forEach((e,i)=>e.classList.toggle('on',i===c));
 }
-addEventListener('scroll',()=>storyUpd(),{passive:true});
+(function loop(){storyUpd();requestAnimationFrame(loop)})();
+/* snap to chapters: phones use CSS snap stops (a strong swipe stops at the next chapter); mouse and trackpad settle smoothly */
+const chapPos=()=>{const st=$('#story'),top=st.getBoundingClientRect().top+scrollY,L=st.offsetHeight-innerHeight;return [0,1,2,3,4].map(i=>top+L*.96*i/4)};
+if(anim&&lenis){let tm;lenis.on('scroll',()=>{clearTimeout(tm);tm=setTimeout(()=>{const st=$('#story'),r=st.getBoundingClientRect();if(r.top>2||r.bottom<innerHeight-2)return;
+  const P=chapPos(),y=scrollY;let best=P[0];P.forEach(v=>{if(Math.abs(v-y)<Math.abs(best-y))best=v});if(Math.abs(best-y)>3)lenis.scrollTo(best,{duration:.8})},160)})}
+if(anim&&!lenis){H.classList.add('snapy');const st=$('#story');[0,1,2,3,4].forEach(i=>{const m=D.createElement('i');m.className='snap';m.style.setProperty('--i',i);st.prepend(m)})}
 
 /* marquee leans with scroll speed */
 if(anim&&lenis){const sk=$('.mq-skew');let v=0;
@@ -718,18 +727,32 @@ const J=a=>(rnd()-.5)*a;
 const rectEdge=(cx,cy,w,h,t)=>{const per=2*(w+h);let d=t*per;if(d<w)return[cx-w/2+d,cy+h/2];d-=w;if(d<h)return[cx+w/2,cy+h/2-d];d-=h;if(d<w)return[cx+w/2-d,cy-h/2];d-=w;return[cx-w/2,cy-h/2+d]};
 for(let i=0;i<NP;i++){
   SEED[i]=rnd();
-  // 0 · an open notebook of handwritten lines, with receipts around it
-  {let x,v,z=0,c,r=rnd();const side=rnd()<.5?-1:1;
-   if(r<.44){const k=Math.floor(rnd()*11),len=.5+.42*((Math.sin(k*12.9+side*3.1)+1)/2);const u=rnd()*len;x=side*(.12+u*1.85);v=.95-k*.19+.028*Math.sin(x*36+k*2);c=rnd()<.8?K.blue:K.sky}
-   else if(r<.6){x=side*(.08+rnd()*1.95);v=J(2.25);c=K.dim}
-   else if(r<.74){const e=rectEdge(side*1.04,0,1.95,2.3,rnd());x=e[0];v=e[1];c=K.pale}
-   else{const R=[[-2.05,-.55,.35],[2.0,.45,-.28],[.95,-1.05,.12]][Math.floor(rnd()*3)],w=.42,h=.8;let a=J(w),b=J(h);if(rnd()<.55)b=Math.round(b/.09)*.09;else{const e=rectEdge(0,0,w,h,rnd());a=e[0];b=e[1]}
-     x=R[0]+a*Math.cos(R[2])-b*Math.sin(R[2]);v=R[1]+a*Math.sin(R[2])+b*Math.cos(R[2]);z=.3;c=K.pale}
-   if(z===0)z=.22*Math.sqrt(Math.min(1,Math.abs(x)/.5));
-   put(0,i,x,v*.72,z-v*.42+J(.02),c)}
-  // 1 · a vortex
-  {const h=rnd()*2.6-1.3,th=rnd()*Math.PI*2+h*4.2,rr=.14+(h+1.3)/2.6*1.65+J(.22);const c=rnd()<.05?K.white:K.deep.clone().lerp(K.pink,(h+1.3)/2.6);
-   put(1,i,rr*Math.cos(th),h*.82,rr*Math.sin(th)*.6,c)}
+  // 0 · a spiral notebook with handwritten lines, a pen and two torn receipts
+  {let x,y,z=0,c,r=rnd(),rot=-.1,cx=-.2,cy=0,local=true;
+   if(r<.16){const e=rectEdge(0,0,1.3,1.75,rnd());x=e[0];y=e[1];c=K.pale}
+   else if(r<.27){const k=Math.floor(rnd()*9),th=rnd()*Math.PI*2;x=-.56+k*.14+.055*Math.cos(th);y=.9+.07*Math.sin(th);c=K.sky}
+   else if(r<.58){const k=Math.floor(rnd()*10),len=.45+.5*((Math.sin(k*7.3)+1)/2),u=rnd()*len;x=-.48+u*.98;y=.62-k*.15+.022*Math.sin(x*42+k*3);c=K.blue}
+   else if(r<.62){x=-.5+J(.01);y=J(1.7);c=K.vio}
+   else if(r<.7){const q=rnd();x=.78+q*.42+J(.025);y=-.85+q*1.25+J(.025);c=q<.1?K.white:K.vio;local=false}
+   else if(r<.92){local=false;const R=rnd()<.5?[1.75,.15,.16]:[-1.8,-.15,-.18],w=.5,h=1.0,q=rnd();let a2,b2;
+     if(q<.5){a2=-.18+rnd()*.36*(rnd()<.3?.6:1);b2=.38-Math.floor(rnd()*7)*.11}
+     else if(q<.8){const e=rectEdge(0,0,w,h,rnd());a2=e[0];b2=e[1];if(b2<-h/2+.01){b2=-h/2+.05*Math.abs(((a2*12)%2)-1)}}
+     else{a2=J(w);b2=-h/2+.05*Math.abs((((a2+1)*12)%2)-1)}
+     x=R[0]+a2*Math.cos(R[2])-b2*Math.sin(R[2]);y=R[1]+a2*Math.sin(R[2])+b2*Math.cos(R[2]);z=.15;c=K.pale}
+   else{local=false;x=J(4.6);y=J(2.2);z=J(.6);c=K.dim}
+   if(local){const X=x*Math.cos(rot)-y*Math.sin(rot),Y=x*Math.sin(rot)+y*Math.cos(rot);x=X+cx;y=Y+cy;z=.05*Math.sin(x*2)}
+   put(0,i,x,y*.95,z+J(.02),c)}
+  // 1 · a workflow chart: steps, a decision and arrows (how we map your work)
+  {let x,y,c,r=rnd();
+   const N=[[-1.75,.5,.85,.42,'r'],[-.35,.5,.85,.42,'r'],[1.1,.5,.62,.62,'d'],[1.1,-.6,.85,.42,'r'],[-.35,-.6,.85,.42,'r']];
+   const A=[[[-1.32,.5],[-.78,.5]],[[.08,.5],[.79,.5]],[[1.1,.19],[1.1,-.39]],[[.67,-.6],[.08,-.6]]];
+   if(r<.5){const n=N[Math.floor(rnd()*5)];if(n[4]==='d'){const q=rnd()*4,k=Math.floor(q),f=q-k,P=[[0,n[3]/2],[n[2]/2,0],[0,-n[3]/2],[-n[2]/2,0]],p0=P[k],p1=P[(k+1)%4];x=n[0]+p0[0]+(p1[0]-p0[0])*f;y=n[1]+p0[1]+(p1[1]-p0[1])*f;c=K.vio}
+     else{const e=rectEdge(n[0],n[1],n[2],n[3],rnd());x=e[0];y=e[1];c=K.pale}}
+   else if(r<.7){const n=N[Math.floor(rnd()*5)];const k=rnd()<.5?1:-1;x=n[0]-.22+rnd()*.44*(n[4]==='d'?.5:1);y=n[1]+k*.06;if(n[4]==='d')x=n[0]-.11+rnd()*.22;c=K.blue}
+   else if(r<.95){const ar=A[Math.floor(rnd()*4)],q=rnd(),p0=ar[0],p1=ar[1],dx=p1[0]-p0[0],dy=p1[1]-p0[1],L=Math.hypot(dx,dy),ux=dx/L,uy=dy/L;
+     if(q<.8){x=p0[0]+dx*q/.8;y=p0[1]+dy*q/.8}else{const s2=rnd()<.5?1:-1,t2=rnd()*.13;x=p1[0]-ux*t2+(-uy)*s2*t2*.6;y=p1[1]-uy*t2+ux*s2*t2*.6}c=K.sky}
+   else{x=J(4.6);y=J(2.2);c=K.dim}
+   put(1,i,x,y,J(.04),c)}
   // 2 · a phone running an app
   {let x,y,c,r=rnd();
    if(r<.3){const e=rectEdge(0,0,1.15,2.1,rnd());x=e[0]+J(.03);y=e[1]+J(.03);c=K.pale}
@@ -737,16 +760,23 @@ for(let i=0;i<NP;i++){
    else if(r<.52){x=J(.9);y=.7+J(.16);c=K.blue}
    else if(r<.84){const k=Math.floor(rnd()*3),cy=.32-k*.36;if(rnd()<.45){const e=rectEdge(0,cy,.9,.26,rnd());x=e[0];y=e[1];c=K.sky}else{x=-.3+rnd()*.62*(k===1?.7:1);y=cy+(rnd()<.5?.05:-.05);c=K.blue}}
    else{x=J(.8);y=-.8+J(.15);c=K.vio}
-   const a=.32;put(2,i,x*Math.cos(a),y,-x*Math.sin(a)+J(.02),c)}
-  // 3 · a cashier screen and a factory gear joined by streams of light
-  {let x,y,z=0,c,r=rnd();
-   if(r<.18){const e=rectEdge(-1.2,.2,1.5,.95,rnd());x=e[0];y=e[1];c=K.pale}
-   else if(r<.36){const tx=Math.floor(rnd()*4),ty=Math.floor(rnd()*2);x=-1.83+tx*.36+rnd()*.28;y=.42-ty*.36+J(.26);c=ty?K.blue:K.vio}
-   else if(r<.42){x=-1.2+J(.62);y=-.42+J(.03);if(rnd()<.4){x=-1.2+J(.05);y=-.27+J(.3)}c=K.pale}
-   else if(r<.66){const th=rnd()*Math.PI*2,rad=(rnd()<.75?.5+(Math.cos(th*10)>.25?.15:0):.2)+J(.04);x=1.35+rad*Math.cos(th);y=.15+rad*Math.sin(th);c=rad>.3?K.vio:K.pink}
-   else if(r<.9){const k=Math.floor(rnd()*3),q=rnd(),x0=-.42,x1=.68,y0=.2+(k-1)*.16,lift=.45-k*.25;x=x0+(x1-x0)*q;y=y0+lift*Math.sin(Math.PI*q)+J(.03);z=J(.05);c=rnd()<.3?K.white:K.sky}
-   else{x=J(4.4);y=-.75+J(.04);c=K.dim}
-   put(3,i,x,y,z+J(.02),c)}
+   const a=.18;put(2,i,x*Math.cos(a),y,-x*Math.sin(a)+J(.02),c)}
+  // 3 · a cashier terminal and a factory, both feeding one live sales chart
+  {let x,y,c,r=rnd();
+   if(r<.12){const e=rectEdge(-1.6,.35,1.0,.68,rnd());x=e[0];y=e[1];c=K.pale}
+   else if(r<.2){x=-1.98+Math.floor(rnd()*3)*.27+rnd()*.2;y=.5-Math.floor(rnd()*2)*.27+J(.16);c=K.blue}
+   else if(r<.3){if(rnd()<.25){x=-1.6+J(.06);y=-.08+J(.14)}else{const e=rectEdge(-1.6,-.36,1.15,.3,rnd());x=e[0];y=e[1];if(rnd()<.3){x=-1.6+J(.5);y=-.36}}c=K.pale}
+   else if(r<.58){const q=rnd();
+     if(q<.4){const e=rectEdge(1.45,-.3,1.2,.5,rnd());x=e[0];y=e[1]}
+     else if(q<.62){const t2=rnd()*3,k=Math.floor(t2),f=t2-k;x=.85+k*.4+f*.4;y=-.05+(f<.7?f/.7*.35:.35*(1-(f-.7)/.3))}
+     else if(q<.76){const e=rectEdge(1.9,.25,.14,.6,rnd());x=e[0];y=e[1]}
+     else if(q<.88){const k=Math.floor(rnd()*3),th=rnd()*Math.PI*2,rr=.05+k*.03;x=1.95+k*.08+rr*Math.cos(th);y=.72+k*.16+rr*Math.sin(th)}
+     else{x=1.0+Math.floor(rnd()*4)*.26+rnd()*.12;y=-.32+J(.1)}
+     c=q<.62?K.vio:q<.88?K.pink:K.sky}
+   else if(r<.76){const k=Math.floor(rnd()*4),hh=[.25,.42,.34,.6][k];x=-.27+k*.18+J(.11);y=.2+rnd()*hh;c=k===3?K.vio:K.blue;if(rnd()<.18){x=-.35+rnd()*.75;y=.2;c=K.pale}}
+   else if(r<.95){const q=rnd();if(rnd()<.5){x=-1.08+q*.68;y=.35+.12*Math.sin(Math.PI*q)}else{x=.48+q*.5;y=.42-.4*q+.1*Math.sin(Math.PI*q)}y+=J(.02);c=rnd()<.35?K.white:K.sky}
+   else{x=J(4.6);y=-.62+J(.03);c=K.dim}
+   put(3,i,x,y,J(.03),c)}
   // 4 · the logo: filled in below from its real outline and colours
 }
 /* sample the real logo outline (the same one the 3D logo uses) */
@@ -814,7 +844,7 @@ let mx=0,my=0,smx=0,smy=0;
 addEventListener('pointermove',e=>{mx=e.clientX/innerWidth-.5;my=e.clientY/innerHeight-.5});
 addEventListener('resize',()=>{const w=innerWidth,h=innerHeight;cam.aspect=w/h;cam.updateProjectionMatrix();R.setSize(w,h,false);comp.setSize(w,h);bloom.setSize(w,h)});
 
-let go=null,lt=0;const clock=new THREE.Clock();
+let go=null,lt=0,ph=0;const clock=new THREE.Clock();
 function draw(){FX?comp.render():R.render(scene,cam)}
 /* watch the frame rate for the first seconds; if the device struggles, step quality down */
 let fN=0,fT=0,step=0;
@@ -857,13 +887,15 @@ function tick(){
   let meshA=1;
   if(storyOn()){
     const r=storyEl.getBoundingClientRect(),sp=Math.min(1,Math.max(0,-r.top/Math.max(1,r.height-innerHeight)));
-    const inn=Math.min(1,Math.max(0,(innerHeight-r.top)/(innerHeight*.7)));
-    const k=Math.min(1,sp/.94)*4,si=Math.min(3,Math.floor(k)),f=k-si;
-    pMat.uniforms.uP.value=k>=4?4:si+ss2(Math.min(1,Math.max(0,(f-.3)/.7)));
-    pMat.uniforms.uT.value=t;
-    const end=ss2(Math.min(1,Math.max(0,(sp-.955)/.045)));
-    const pa=inn*(1-end);pMat.uniforms.uA.value=pa;pts.visible=pa>.01;
-    meshA=Math.max(1-inn,end);
+    const vis=Math.min(1,Math.max(0,(innerHeight-r.top)/(innerHeight*.7)))*Math.min(1,Math.max(0,r.bottom/(innerHeight*.6)));
+    const tgt=Math.min(1,sp/.96)*4;
+    if(vis<.02)ph=tgt;                                  // off screen: stay in step with the page
+    else{const rate=still?99:(Math.abs(tgt-ph)>1.5?1.9:1.15);ph+=Math.max(-dt*rate,Math.min(dt*rate,tgt-ph))}  // on screen: one steady change at a time
+    window.MINOVA_PH=vis>.02?ph:null;
+    pMat.uniforms.uP.value=ph;pMat.uniforms.uT.value=t;
+    const end=ss2(Math.min(1,Math.max(0,(ph-3.8)/.2)));
+    const pa=vis*(1-end);pMat.uniforms.uA.value=pa;pts.visible=pa>.01;
+    meshA=Math.max(1-vis,end);
   }
   mat.opacity=sideMat.opacity=meshA;mark.visible=meshA>.01;head.material.opacity*=meshA;
   // every few seconds a spark runs along the orbit into the comet
