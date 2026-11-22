@@ -90,7 +90,8 @@ main,header,footer{position:relative;z-index:2}
 .top.hide{transform:translateY(-110%)}
 .brand{display:flex;align-items:center;gap:10px;font-weight:800;letter-spacing:.14em;font-size:15px}
 .brand img{width:58px;height:auto;display:block}
-.brand small{display:block;font-size:8.5px;letter-spacing:.32em;color:var(--mute);font-weight:600}
+.brand small{display:block;font-size:8.5px;letter-spacing:.32em;color:var(--mute);font-weight:600;white-space:nowrap}
+@media(max-width:860px){.brand{font-size:14px}.brand small{font-size:7.5px;letter-spacing:.18em}.brand img{width:50px}}
 .nav{display:flex;gap:28px;margin-inline-start:auto;font-size:14px;font-weight:500;color:var(--mute)}
 .nav a{position:relative;padding:6px 0}.nav a::after{content:"";position:absolute;inset:auto 0 0;height:1px;background:currentColor;transform:scaleX(0);transform-origin:right;transition:transform .5s var(--ease)}
 .nav a:hover{color:var(--ink)}.nav a:hover::after{transform:scaleX(1);transform-origin:left}
@@ -123,7 +124,7 @@ h1{font-size:clamp(42px,6.4vw,96px);line-height:.98;letter-spacing:-.04em;font-w
 .hint{position:absolute;inset-inline-end:max(5vw,16px);bottom:clamp(40px,7vh,80px);display:flex;align-items:center;gap:12px;font-size:13px;color:var(--dim)}
 .hint b{width:1px;height:56px;background:var(--line);position:relative;overflow:hidden}.hint b::after{content:"";position:absolute;inset:0;background:linear-gradient(var(--sky),transparent);animation:fall 2.2s var(--ease) infinite}
 @keyframes fall{from{transform:translateY(-100%)}to{transform:translateY(100%)}}
-@media(max-width:760px){.hero{align-items:end;padding-top:52vh}.hint{display:none}}
+@media(max-width:760px){.hero{align-items:start;min-height:0;padding-top:calc(34vh + 24px);padding-bottom:64px}.hint{display:none}}
 .no3d .hero{background:radial-gradient(50% 40% at 75% 40%,rgba(47,123,255,.3),transparent)}
 
 /* marquee */
@@ -581,7 +582,7 @@ let FX=!LOW;   // bloom and blend only where the device can afford them
 let R;
 try{R=new THREE.WebGLRenderer({canvas:cv,antialias:true,alpha:true,powerPreference:LOW?'low-power':'high-performance'})}
 catch(e){document.documentElement.classList.add('no3d');window.MINOVA_3D=true;throw e}
-let DPR=Math.min(devicePixelRatio,LOW?1.75:2);R.setPixelRatio(DPR);
+let DPR=Math.min(devicePixelRatio,2);R.setPixelRatio(DPR);
 if(!FX)cv.style.mixBlendMode='normal';
 R.setSize(innerWidth,innerHeight,false);
 R.toneMapping=THREE.ACESFilmicToneMapping;R.toneMappingExposure=1.0;
@@ -657,7 +658,7 @@ const bloom=new UnrealBloomPass(new THREE.Vector2(innerWidth,innerHeight),.42,.5
 /* --- where the M sits in each section --- */
 const wide=()=>innerWidth/innerHeight>1.05;
 const S={
- hero:()=>wide()?{x:2.35,y:.05,z:0,s:.9,ry:-.12,rx:.04,o:1}:{x:0,y:1.55,z:0,s:.5,ry:0,rx:.05,o:1},
+ hero:()=>wide()?{x:2.35,y:.05,z:0,s:.9,ry:-.12,rx:.04,o:1}:{x:0,y:1.72,z:0,s:.54,ry:0,rx:.05,o:1},
  manifesto:()=>wide()?{x:4.4,y:.9,z:-3.5,s:.62,ry:.5,rx:.2,o:.7}:{x:0,y:1.6,z:-3,s:.5,ry:.8,rx:.2,o:.18},
  services:()=>wide()?{x:2.9,y:1.2,z:-3,s:.7,ry:-1.1,rx:-.2,o:.5}:{x:0,y:1.8,z:-4,s:.5,ry:-1,rx:-.2,o:.15},
  work:()=>({x:0,y:0,z:-6,s:1.1,ry:.25,rx:.1,o:.22}),
