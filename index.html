@@ -896,9 +896,11 @@ function tick(){
     if(typeof window.MINOVA_JUMP==='number'){stT=window.MINOVA_JUMP*SEG;window.MINOVA_JUMP=null}
     if(stT>=TOT)stT=0;
     let seg=Math.min(4,Math.floor(stT/SEG)),w=stT-seg*SEG,p;
-    if(seg>=4){p=4;window.MINOVA_SEGP=Math.min(1,(stT-4*SEG)/END)}
-    else{p=seg+(w>HOLD?ss2((w-HOLD)/MORPH):0);window.MINOVA_SEGP=Math.min(1,w/SEG)}
+    if(seg>=4)p=4;else p=seg+(w>HOLD?ss2((w-HOLD)/MORPH):0);
     if(still)p=Math.round(p);
+    {// each bar fills over exactly the time its title is on screen (titles switch halfway through a morph)
+     const c=Math.max(0,Math.min(4,Math.round(p))),a0=c===0?0:c*SEG-MORPH/2,a1=c===4?TOT:(c+1)*SEG-MORPH/2;
+     window.MINOVA_SEGP=Math.min(1,Math.max(0,(stT-a0)/(a1-a0)))}
     ph=p;window.MINOVA_PH=vis>.02?ph:null;
     pMat.uniforms.uP.value=ph;pMat.uniforms.uT.value=t;
     const end=ss2(Math.min(1,Math.max(0,(ph-3.75)/.25)));
