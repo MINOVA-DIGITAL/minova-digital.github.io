@@ -155,25 +155,26 @@ h2{font-size:clamp(34px,4.6vw,68px);line-height:1.02;letter-spacing:-.035em;font
 /* story: chapters stay pinned while the particles change shape */
 .story{position:relative}
 .story-in{padding:90px max(5vw,16px)}
-.anim .story-in{position:sticky;top:0;height:100vh;height:100svh;padding:0 max(5vw,16px);display:flex;align-items:center;overflow:hidden}
+.story{min-height:100vh;min-height:100svh;display:flex}
+.anim .story-in{position:relative;flex:1;min-height:100vh;min-height:100svh;padding:0 max(5vw,16px);display:flex;align-items:center;overflow:hidden}
 .chs{display:grid;gap:56px;max-width:560px}
 .anim .chs{gap:0;width:min(560px,44vw)}
 .anim .ch{grid-area:1/1;opacity:0;transform:translateY(-18px);transition:opacity .28s ease,transform .3s ease;align-self:center;pointer-events:none}
 .anim .ch.on{opacity:1;transform:none;transition:opacity .55s ease .3s,transform .9s var(--ease) .3s;pointer-events:auto}
 .anim .ch:not(.on){transform:translateY(-18px)}
-.skipb{display:none}
-.anim .skipb{display:inline-flex;align-items:center;gap:8px;position:absolute;inset-inline-end:max(5vw,16px);bottom:calc(7vh - 14px);min-height:44px;padding:0 16px;border-radius:99px;border:1px solid var(--line);color:var(--mute);font-size:14px;background:rgba(3,8,23,.5)}
-.skipb:hover{color:var(--ink);border-color:rgba(170,190,255,.35)}
 .ch small{display:flex;align-items:center;gap:12px;font-size:14px;font-weight:600;color:var(--sky);margin-bottom:18px}
 .ch small::before{content:"";width:28px;height:1px;background:currentColor}
 .ch h2{font-size:clamp(32px,4.2vw,62px);max-width:14ch;margin:0 0 18px}
 .ch p{margin:0;color:var(--mute);font-size:17px;max-width:42ch}
 .sdots{display:none}
 .anim .sdots{display:flex;gap:8px;position:absolute;inset-inline-start:max(5vw,16px);bottom:7vh}
-.sdots i{width:30px;height:3px;border-radius:3px;background:var(--line);transition:background .5s,width .5s}
-.sdots i.on{width:54px;background:linear-gradient(90deg,var(--blue),var(--violet))}
+.sdots button{position:relative;width:34px;height:24px;padding:0;display:grid;align-items:center}
+.sdots button::before{content:"";height:3px;border-radius:3px;background:var(--line)}
+.sdots button::after{content:"";position:absolute;left:0;top:50%;height:3px;margin-top:-1.5px;border-radius:3px;background:linear-gradient(90deg,var(--blue),var(--violet));width:var(--f,0%)}
+[dir=rtl] .sdots button::after{left:auto;right:0}
+.sdots button.done{--f:100%}
+.sdots button:focus-visible{outline-offset:2px}
 @media(max-width:760px){
-  .anim .skipb{bottom:calc(6vh - 14px)}
   .anim .story-in{align-items:flex-end;padding-bottom:13vh}
   .anim .chs{width:100%}
   .ch h2{font-size:clamp(30px,8.4vw,40px)}
@@ -359,8 +360,7 @@ footer{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-betw
   <section class="story" id="story" data-s="story" data-blend=".9" aria-label="Our story">
     <div class="story-in">
       <div class="chs" id="chs"></div>
-      <div class="sdots" id="sdots" aria-hidden="true"></div>
-      <button class="skipb" id="skip" type="button" data-k="skp">Skip ↓</button>
+      <div class="sdots" id="sdots" role="group" aria-label="Story chapters"></div>
     </div>
   </section>
 
@@ -482,7 +482,7 @@ function render(){
   $('#steps').innerHTML=`<div class="rail"><i id="rail"></i></div>`+T.steps.map(s=>`<div class="step"><span class="dot">${ic(s[0])}</span><h3>${lang==='en'?s[1]:s[2]}</h3><p>${lang==='en'?s[3]:s[4]}</p></div>`).join('');
   $('#prom').innerHTML=T.prom.map(p=>`<div><b>${lang==='en'?p[0]:p[1]}</b><span>${lang==='en'?p[2]:p[3]}</span></div>`).join('');
   $('#chs').innerHTML=STORY.map((c,i)=>`<div class="ch" data-i="${i}"><small>${lang==='en'?c[0]:c[1]}</small><h2>${lang==='en'?c[2]:c[3]}</h2><p>${lang==='en'?c[4]:c[5]}</p></div>`).join('');
-  $('#sdots').innerHTML=STORY.map(()=>'<i></i>').join('');
+  $('#sdots').innerHTML=STORY.map((c,i)=>`<button type="button" data-c="${i}" aria-label="${lang==='en'?c[2]:c[3]}"></button>`).join('');
   split($('#h1'),'w');storyUpd(true);
   window.MINOVA_RTL=lang==='ar';
   bindHover();
@@ -529,69 +529,22 @@ function build(){
   ST.refresh();
 }
 
-/* story: when it reaches the top, the page holds still and each gesture moves exactly one chapter.
-   Input during a transition is ignored, so a strong swipe can never skip it. After the last chapter the page carries on. */
-let chOn=-1,ch=0,locked=false,cool=0,navUntil=0;
-const storyEl=$('#story'),stTop=()=>storyEl.getBoundingClientRect().top+scrollY;
-window.MINOVA_CH=0;
+/* story: plays by itself like a short video while it is on screen; scrolling stays completely normal */
+let chOn=-1;const storyEl=$('#story');let fbT=0,fbLast=performance.now();
 function storyUpd(force){
   if(!anim||!storyEl)return;
-  if(!locked)window.MINOVA_CH=storyEl.getBoundingClientRect().top>0?0:4;
-  const ph=typeof window.MINOVA_PH==='number'?window.MINOVA_PH:window.MINOVA_CH;   // the text follows the animation
+  let ph=window.MINOVA_PH,f=window.MINOVA_SEGP;
+  if(typeof ph!=='number'){            // no 3D available: still play the chapters on a timer
+    const now=performance.now(),r=storyEl.getBoundingClientRect(),on=r.top<innerHeight*.6&&r.bottom>innerHeight*.4;
+    if(on)fbT+=now-fbLast;else fbT=0;fbLast=now;const k=(fbT/3700)%5;ph=Math.floor(k);f=k-ph}
   const c=Math.max(0,Math.min(4,Math.round(ph)));
+  const bars=$$('#sdots button');bars.forEach((e,i)=>{e.classList.toggle('done',i<c);if(i===c)e.style.setProperty('--f',Math.round((f||0)*100)+'%');else e.style.removeProperty('--f')});
   if(c===chOn&&!force)return;chOn=c;
   $$('#chs .ch').forEach((e,i)=>e.classList.toggle('on',i===c));
-  $$('#sdots i').forEach((e,i)=>e.classList.toggle('on',i===c));
+  bars.forEach((e,i)=>e.setAttribute('aria-current',i===c?'step':'false'));
 }
 (function loop(){storyUpd();requestAnimationFrame(loop)})();
-function lock(at){
-  locked=true;ch=at;window.MINOVA_CH=ch;cool=performance.now()+700;if(window.__wheelUsed)window.__wheelUsed();
-  const y=stTop();
-  if(lenis){lenis.stop();lenis.scrollTo(y,{immediate:true,force:true})}
-  H.style.overflow='hidden';D.body.style.overflow='hidden';scrollTo(0,y);
-  storyEl.classList.add('held');
-}
-function unlock(dir){
-  locked=false;storyEl.classList.remove('held');
-  H.style.overflow='';D.body.style.overflow='';
-  const y=stTop()+(dir>0?innerHeight:-innerHeight*.85);
-  if(lenis){lenis.start();lenis.scrollTo(y,{duration:1.2})}else scrollTo({top:y,behavior:'smooth'});
-  navUntil=performance.now()+1500;
-}
-function animDone(){const ph=window.MINOVA_PH,fresh=performance.now()-(window.MINOVA_PHT||0)<1500;return !fresh||typeof ph!=='number'||Math.abs(ph-ch)<.04}
-function step(dir){
-  const now=performance.now();if(now<cool||!animDone())return;
-  if(dir>0&&ch>=4){unlock(1);return}
-  if(dir<0&&ch<=0){unlock(-1);return}
-  ch+=dir;window.MINOVA_CH=ch;cool=now+450;
-}
-if(anim&&storyEl&&!still){
-  let prevY=scrollY;
-  const watch=()=>{const y=scrollY,t=stTop();
-    if(!locked&&performance.now()>navUntil&&!H.classList.contains('menu-open')){
-      if(prevY<t-14&&y>=t-14)lock(0);           // arrived from above: start at chapter 1
-      else if(prevY>t+14&&y<=t+14)lock(4);      // came back from below: start at the end
-    }
-    prevY=locked?t:y};
-  if(lenis)lenis.on('scroll',watch);addEventListener('scroll',watch,{passive:true});
-  // mouse wheel / trackpad: one continuous stream of wheel events counts as one gesture
-  let lastW=0,used=false,acc=0;
-  addEventListener('wheel',e=>{const now=performance.now(),fresh=now-lastW>220;lastW=now;
-    if(!locked)return;e.preventDefault();
-    if(fresh){used=false;acc=0}acc+=e.deltaY;
-    if(!used&&Math.abs(acc)>30&&now>=cool&&animDone()){used=true;step(Math.sign(acc))}},{passive:false});
-  window.__wheelUsed=()=>{used=true};
-  // touch: one swipe = one chapter
-  let ty=null;
-  addEventListener('touchstart',e=>{if(locked)ty=e.touches[0].clientY},{passive:true});
-  addEventListener('touchmove',e=>{if(locked)e.preventDefault()},{passive:false});
-  addEventListener('touchend',e=>{if(!locked||ty===null)return;const dy=ty-e.changedTouches[0].clientY;ty=null;if(Math.abs(dy)>36)step(Math.sign(dy))},{passive:true});
-  addEventListener('keydown',e=>{if(!locked)return;const k=e.key;
-    if(['ArrowDown','PageDown',' '].includes(k)){e.preventDefault();step(1)}
-    else if(['ArrowUp','PageUp'].includes(k)){e.preventDefault();step(-1)}
-    else if(k==='Escape'||k==='End'){unlock(1)}});
-  $('#skip').addEventListener('click',()=>{if(locked)unlock(1);else{navUntil=performance.now()+1500;const y=stTop()+innerHeight;lenis?lenis.scrollTo(y,{duration:1}):scrollTo({top:y,behavior:'smooth'})}});
-}
+D.addEventListener('click',e=>{const b=e.target.closest('#sdots button');if(!b)return;window.MINOVA_JUMP=+b.dataset.c;fbT=+b.dataset.c*3700});
 
 /* marquee leans with scroll speed */
 if(anim&&lenis){const sk=$('.mq-skew');let v=0;
@@ -633,7 +586,7 @@ function bindHover(){
 }
 
 /* smooth anchors */
-D.addEventListener('click',e=>{const a=e.target.closest('a[href^="#"]');if(!a)return;e.preventDefault();menu(false);navUntil=performance.now()+2200;if(locked){locked=false;storyEl.classList.remove('held');H.style.overflow='';D.body.style.overflow='';if(lenis)lenis.start()}
+D.addEventListener('click',e=>{const a=e.target.closest('a[href^="#"]');if(!a)return;e.preventDefault();menu(false);
   const id=a.getAttribute('href').slice(1),t=(id==='home'||id==='main')?0:D.getElementById(id);
   if(lenis)lenis.scrollTo(t,{offset:0,duration:1.4,easing:x=>1-Math.pow(1-x,4)});else (t?t.scrollIntoView({behavior:still?'auto':'smooth'}):scrollTo({top:0,behavior:still?'auto':'smooth'}));
   const f=t||$('#main');if(f){if(!f.hasAttribute('tabindex'))f.setAttribute('tabindex','-1');f.focus({preventScroll:true})}});
@@ -865,7 +818,8 @@ const storyOn=()=>document.documentElement.classList.contains('anim')&&storyEl;
 const wide=()=>innerWidth/innerHeight>1.05;
 const S={
  hero:()=>wide()?(innerWidth/innerHeight<1.9?{x:2.62,y:.05,z:0,s:.8,ry:-.12,rx:.04,o:1}:{x:2.35,y:.05,z:0,s:.9,ry:-.12,rx:.04,o:1}):{x:0,y:1.72,z:0,s:.54,ry:0,rx:.05,o:1},
- story:()=>wide()?{x:1.65,y:-.05,z:0,s:.95,ry:0,rx:0,o:1}:{x:0,y:1.2,z:0,s:.5,ry:0,rx:0,o:1},
+ story:()=>{const r=storyEl.getBoundingClientRect(),f=(r.top+innerHeight*(wide()?.5:.3))/innerHeight,y=(.5-f)*2*Math.tan(THREE.MathUtils.degToRad(17.5))*9;   // the shapes ride with the section as the page scrolls
+   return wide()?{x:1.65,y,z:0,s:.95,ry:0,rx:0,o:1}:{x:0,y,z:0,s:.5,ry:0,rx:0,o:1}},
  services:()=>wide()?{x:2.9,y:1.2,z:-3,s:.7,ry:-.45,rx:-.2,o:.5}:{x:0,y:2.6,z:-4,s:.5,ry:-.4,rx:-.2,o:0},
  work:()=>wide()?{x:0,y:0,z:-6,s:1.1,ry:.25,rx:.1,o:.22}:{x:0,y:2.6,z:-4,s:.5,ry:.25,rx:.1,o:0},
  process:()=>wide()?{x:-.6,y:-.4,z:-6,s:1,ry:.45,rx:.15,o:.28}:{x:0,y:2.6,z:-3,s:.5,ry:.4,rx:.15,o:0},
@@ -891,7 +845,7 @@ let mx=0,my=0,smx=0,smy=0;
 addEventListener('pointermove',e=>{mx=e.clientX/innerWidth-.5;my=e.clientY/innerHeight-.5});
 addEventListener('resize',()=>{const w=innerWidth,h=innerHeight;cam.aspect=w/h;cam.updateProjectionMatrix();R.setSize(w,h,false);comp.setSize(w,h);bloom.setSize(w,h)});
 
-let go=null,lt=0,ph=0;const clock=new THREE.Clock();
+let go=null,lt=0,ph=0,stT=0;const clock=new THREE.Clock();
 function draw(){FX?comp.render():R.render(scene,cam)}
 /* watch the frame rate for the first seconds; if the device struggles, step quality down */
 let fN=0,fT=0,step=0;
@@ -930,19 +884,28 @@ function tick(){
   mark.rotation.z=vel*.0012;
   cv.style.opacity=cur.o.toFixed(3);
 
-  // the story: progress through the pinned section drives the particle shapes
+  // the story plays by itself while on screen: each chapter holds, then morphs into the next; ends on the logo, then replays
   let meshA=1;
   if(storyOn()){
-    const r=storyEl.getBoundingClientRect(),sp=Math.min(1,Math.max(0,-r.top/Math.max(1,r.height-innerHeight)));
-    const vis=Math.min(1,Math.max(0,(innerHeight-r.top)/(innerHeight*.7)))*Math.min(1,Math.max(0,r.bottom/(innerHeight*.6)));
-    const tgt=typeof window.MINOVA_CH==='number'?window.MINOVA_CH:0;
-    if(vis<.02)ph=tgt;                                  // off screen: stay in step with the page
-    else{const rdt=Math.min(.5,t-(window.__phT||t));const rate=still?99:1.15;ph+=Math.max(-rdt*rate,Math.min(rdt*rate,tgt-ph))}  // on screen: one steady change at a time
-    window.__phT=t;window.MINOVA_PH=vis>.02?ph:null;window.MINOVA_PHT=performance.now();
+    const r=storyEl.getBoundingClientRect();
+    const vis=Math.min(1,Math.max(0,Math.min(innerHeight-r.top,r.bottom)/(innerHeight*.55)));
+    const rdt=Math.min(.25,t-(window.__phT||t));window.__phT=t;
+    const HOLD=2.5,MORPH=1.2,SEG=HOLD+MORPH,END=4.5,TOT=4*SEG+END;
+    if(vis<.05)stT=0;                                          // off screen: rewind, so it starts fresh next time
+    else if(vis>.5)stT+=rdt;                                    // playing while mostly in view
+    if(typeof window.MINOVA_JUMP==='number'){stT=window.MINOVA_JUMP*SEG;window.MINOVA_JUMP=null}
+    if(stT>=TOT)stT=0;
+    let seg=Math.min(4,Math.floor(stT/SEG)),w=stT-seg*SEG,p;
+    if(seg>=4){p=4;window.MINOVA_SEGP=Math.min(1,(stT-4*SEG)/END)}
+    else{p=seg+(w>HOLD?ss2((w-HOLD)/MORPH):0);window.MINOVA_SEGP=Math.min(1,w/SEG)}
+    if(still)p=Math.round(p);
+    ph=p;window.MINOVA_PH=vis>.02?ph:null;
     pMat.uniforms.uP.value=ph;pMat.uniforms.uT.value=t;
-    const end=ss2(Math.min(1,Math.max(0,(ph-3.8)/.2)));
-    const pa=vis*(1-end);pMat.uniforms.uA.value=pa;pts.visible=pa>.01;
-    meshA=Math.max(1-vis,end);
+    const end=ss2(Math.min(1,Math.max(0,(ph-3.75)/.25)));
+    const restart=Math.min(1,stT/.5);                          // fade in at the start of each play
+    const pa=vis*(1-end)*restart;pMat.uniforms.uA.value=pa;pts.visible=pa>.01;
+    const out=Math.min(1,Math.max(0,(stT-(TOT-.6))/.6));        // logo fades before the replay
+    meshA=Math.max(1-vis,end*(1-out));
   }
   mat.opacity=sideMat.opacity=meshA;mark.visible=meshA>.01;head.material.opacity*=meshA;
   // every few seconds a spark runs along the orbit into the comet
